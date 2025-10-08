@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>TEKA-TEKI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #006400; /* Hijau tua */
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 80px auto;
+            background-color: #90EE90; /* Hijau muda */
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        h1 {
+            color: #003300;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            color: #333;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        /* Feedback tidak ditampilkan */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TEKA-TEKI</h1>
+        <p>
+            Aku adalah seekor hewan. Jumlah kakiku ada empat buah.<br>
+            Aku memiliki ekor. Aku juga memiliki belalai.<br>
+            <strong>Siapakah aku?</strong>
+        </p>
+        <input type="text" id="jawaban" placeholder="Tulis jawaban di sini">
+        <br>
+        <button onclick="periksaJawaban()">Kirim Jawaban</button>
+    </div>
+
+    <script>
+        function periksaJawaban() {
+            const jawaban = document.getElementById("jawaban").value.trim().toLowerCase();
+            if (jawaban === "gajah") {
+                alert("Jawaban Anda benar, hebat");
+            } else {
+                alert("Jawaban Anda salah, silahkan coba lagi.");
+            }
+        }
+    </script>
+</body>
+</html>
