@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>Latihan Menyusun Kalimat Bahasa Arab</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Arial', sans-serif;
+      direction: rtl;
+      background-color: #f0f0f0;
+    }
+
+    header {
+      background-color: #001f3f; /* biru dongker */
+      color: white;
+      text-align: center;
+      padding: 12px 10px;
+      line-height: 1.25;
+      height: 1.75cm;
+    }
+
+    #app {
+      display: flex;
+      min-height: calc(100vh - 1.75cm);
+    }
+
+    .sidebar {
+      width: 8cm;
+      background-color: #f8f8f8;
+      border-left: 2px solid #ccc;
+      padding: 10px;
+      text-align: right;
+      overflow-y: auto;
+    }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      font-size: 16px;
+      text-align: right;
+      cursor: pointer;
+      background-color: #fff;
+      border: 1px solid #ccc;
+    }
+
+    .sidebar button:hover {
+      background-color: #e6f2ff;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+      background-color: #ffffff;
+    }
+
+    .word-box {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .word {
+      background-color: #ddd;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: grab;
+      user-select: none;
+      font-size: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      font-size: 20px;
+      padding: 10px;
+      resize: none;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      direction: rtl;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      justify-content: flex-end;
+    }
+
+    .buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .hasil { background-color: green; }
+    .reset { background-color: red; }
+    .acak { background-color: blue; }
+
+    #feedback {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>LATIHAN MENYUSUN KALIMAT BAHASA ARAB</div>
+    <div>Disusun oleh: Tim Pengembang Media Pembelajaran Online Berbasis AI</div>
+  </header>
+
+  <div id="app">
+    <div class="sidebar" id="sidebar">
+      <!-- Navigator -->
+    </div>
+
+    <div class="content">
+      <h2 id="soal-title">Pilih soal dari navigator sebelah kiri</h2>
+      <div class="word-box" id="wordBox"></div>
+      <textarea id="answerBox" ondrop="drop(event)" ondragover="allowDrop(event)"></textarea>
+      <div class="buttons">
+        <button class="hasil" onclick="checkAnswer()">Hasil</button>
+        <button class="reset" onclick="resetQuestion()">Reset</button>
+        <button class="acak" onclick="shuffleWords()">Acak</button>
+      </div>
+      <div id="feedback"></div>
+    </div>
+  </div>
+
+  <script>
+    const soal = [
+      ["أَنَا","أُحِبُّ","ٱلْمَدْرَسَةَ"],
+      ["هُوَ","يَكْتُبُ","ٱلدَّرْسَ"],
+      ["نَحْنُ","نَذْهَبُ","إِلَى","ٱلْمَسْجِدِ"],
+      ["هِيَ","تَقْرَأُ","ٱلْكِتَابَ"],
+      ["ٱلطَّالِبُ","يَجْلِسُ","فِي","ٱلْفَصْلِ"],
+      ["ٱلْمُعَلِّمُ","يُشْرِحُ","ٱلدَّرْسَ"],
+      ["أَنَا","آكُلُ","ٱلتُّفَّاحَ"],
+      ["أَنْتَ","تَشْرَبُ","ٱلْمَاءَ"],
+      ["هُمْ","يَلْعَبُونَ","فِي","ٱلْحَدِيقَةِ"],
+      ["نَحْنُ","نَكْتُبُ","ٱلْوَاجِبَ"]
+    ];
+
+    let currentSoalIndex = null;
+    let currentWords = [];
+
+    const sidebar = document.getElementById('sidebar');
+    const wordBox = document.getElementById('wordBox');
+    const answerBox = document.getElementById('answerBox');
+    const soalTitle = document.getElementById('soal-title');
+    const feedback = document.getElementById('feedback');
+
+    // Create navigator buttons
+    soal.forEach((_, index) => {
+      const btn = document.createElement('button');
+      btn.textContent = `سؤال رقم ${index + 1}`;
+      btn.onclick = () => loadQuestion(index);
+      sidebar.appendChild(btn);
+    });
+
+    function shuffle(array) {
+      const newArr = array.slice();
+      for (let i = newArr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+      }
+      return newArr;
+    }
+
+    function loadQuestion(index) {
+      currentSoalIndex = index;
+      soalTitle.textContent = `سؤال رقم ${index + 1}: قم بترتيب الكلمات التالية`;
+      feedback.textContent = "";
+      answerBox.value = "";
+
+      currentWords = shuffle(soal[index]);
+      renderWords();
+    }
+
+    function renderWords() {
+      wordBox.innerHTML = "";
+      currentWords.forEach((word, idx) => {
+        const span = document.createElement('span');
+        span.className = 'word';
+        span.textContent = word;
+        span.draggable = true;
+        span.id = `word-${idx}`;
+        span.ondragstart = drag;
+        wordBox.appendChild(span);
+      });
+    }
+
+    function drag(event) {
+      event.dataTransfer.setData("text", event.target.id);
+    }
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData("text");
+      const wordEl = document.getElementById(data);
+      if (wordEl) {
+        answerBox.value += wordEl.textContent + " ";
+        wordEl.remove();
+      }
+    }
+
+    function checkAnswer() {
+      if (currentSoalIndex === null) return;
+      const userAnswer = answerBox.value.trim().replace(/\s+/g, " ");
+      const correctAnswer = soal[currentSoalIndex].join(" ");
+      if (userAnswer === correctAnswer) {
+        feedback.textContent = "Hebat. Jawaban Anda benar";
+        feedback.style.color = "green";
+      } else {
+        feedback.textContent = "Maaf. Jawaban Anda salah. Ulangi lagi.";
+        feedback.style.color = "red";
+      }
+    }
+
+    function resetQuestion() {
+      if (currentSoalIndex !== null) {
+        loadQuestion(currentSoalIndex);
+      }
+    }
+
+    function shuffleWords() {
+      if (currentSoalIndex !== null) {
+        currentWords = shuffle(soal[currentSoalIndex]);
+        answerBox.value = "";
+        feedback.textContent = "";
+        renderWords();
+      }
+    }
+  </script>
+</body>
+</html>
