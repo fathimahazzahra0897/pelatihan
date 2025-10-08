@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Urutkan Kata Bahasa Inggris</title>
+  <style>
+    body {
+      background-color: #001f4d; /* biru tua */
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .container {
+      background-color: #add8e6; /* biru muda */
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .words {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .word {
+      background-color: white;
+      color: black;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: grab;
+      user-select: none;
+    }
+
+    textarea {
+      width: 90%;
+      height: 100px;
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 16px;
+      resize: none;
+      border-radius: 5px;
+      border: none;
+      background-color: white;
+      color: black;
+    }
+
+    button {
+      margin: 10px 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #checkBtn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    #resetBtn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    #prevBtn, #nextBtn {
+      background-color: #4682B4;
+      color: white;
+    }
+
+    #feedback {
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    h2 {
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 id="questionTitle">Soal 1: Susunlah kata-kata berikut menjadi kalimat yang benar!</h2>
+    <div id="wordContainer" class="words"></div>
+
+    <textarea id="answerBox" ondrop="drop(event)" ondragover="allowDrop(event)"></textarea>
+
+    <div>
+      <button id="checkBtn" onclick="checkAnswer()">Hasil</button>
+      <button id="resetBtn" onclick="resetQuestion()">Reset</button>
+    </div>
+
+    <div>
+      <button id="prevBtn" onclick="prevQuestion()">Previous</button>
+      <button id="nextBtn" onclick="nextQuestion()">Next</button>
+    </div>
+
+    <div id="feedback"></div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        correct: "I am going to the school",
+        words: ["I", "am", "going", "to", "the", "school"]
+      },
+      {
+        correct: "I will go to the mountain",
+        words: ["I", "will", "go", "to", "the", "mountain"]
+      },
+      {
+        correct: "I will play football tomorrow",
+        words: ["I", "will", "play", "football", "tomorrow"]
+      },
+      {
+        correct: "I am speaking English",
+        words: ["I", "am", "speaking", "English"]
+      },
+      {
+        correct: "I went to the zoo yesterday",
+        words: ["I", "went", "to", "the", "zoo", "yesterday"]
+      }
+    ];
+
+    let currentIndex = 0;
+
+    function shuffle(array) {
+      const newArr = array.slice();
+      for (let i = newArr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+      }
+      return newArr;
+    }
+
+    function displayQuestion() {
+      const container = document.getElementById("wordContainer");
+      container.innerHTML = "";
+      document.getElementById("answerBox").value = "";
+      document.getElementById("feedback").textContent = "";
+
+      const question = questions[currentIndex];
+      const shuffledWords = shuffle(question.words);
+
+      shuffledWords.forEach((word, index) => {
+        const span = document.createElement("span");
+        span.className = "word";
+        span.textContent = word;
+        span.draggable = true;
+        span.id = `word-${index}`;
+        span.ondragstart = drag;
+        container.appendChild(span);
+      });
+
+      document.getElementById("questionTitle").textContent = `Soal ${currentIndex + 1}: Susunlah kata-kata berikut menjadi kalimat yang benar!`;
+    }
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drag(event) {
+      event.dataTransfer.setData("text", event.target.id);
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData("text");
+      const draggedElement = document.getElementById(data);
+      if (draggedElement) {
+        const answerBox = document.getElementById("answerBox");
+        answerBox.value += draggedElement.textContent + " ";
+        draggedElement.remove(); // hilangkan setelah dipindah
+      }
+    }
+
+    function checkAnswer() {
+      const userAnswer = document.getElementById("answerBox").value.trim().replace(/\s+/g, ' ');
+      const correctAnswer = questions[currentIndex].correct;
+      const feedback = document.getElementById("feedback");
+      if (userAnswer === correctAnswer) {
+        feedback.textContent = "Hebat. Jawaban anda benar!";
+        feedback.style.color = "green";
+      } else {
+        feedback.textContent = "Maaf. Jawaban anda salah. Ulangi lagi.";
+        feedback.style.color = "yellow";
+      }
+    }
+
+    function resetQuestion() {
+      displayQuestion();
+    }
+
+    function nextQuestion() {
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        displayQuestion();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        displayQuestion();
+      }
+    }
+
+    window.onload = function () {
+      displayQuestion();
+    };
+  </script>
+</body>
+</html>
